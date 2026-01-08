@@ -6,7 +6,7 @@ import os
 from datetime import datetime
 
 URL = "https://www.ticketmaster.de/artist/bts-tickets/958687"
-CHECK_INTERVAL = 300  # 5 minutes
+CHECK_INTERVAL = 60  # 1 minutes
 
 def play_notification():
     # Play system notification sound (macOS)
@@ -19,16 +19,16 @@ def check_tickets():
         response = requests.get(URL, headers={'User-Agent': 'Mozilla/5.0'})
         content = response.text
         
-        # Look for "Konzerte" followed by a number
-        match = re.search(r'konzerte(\d+)', content.lower())
+        # Look for "X Ergebnisse" pattern
+        match = re.search(r'(\d+)\s+ergebnisse', content.lower())
         if match:
             count = int(match.group(1))
             if count > 0:
-                return True, f"TICKETS AVAILABLE! Konzerte count: {count}"
+                return True, f"TICKETS AVAILABLE! {count} Ergebnisse found"
             else:
-                return False, f"No concerts yet (Konzerte{count})"
+                return False, f"No results yet ({count} Ergebnisse)"
         
-        return False, "Konzerte pattern not found"
+        return False, "Ergebnisse pattern not found"
     
     except Exception as e:
         return False, f"Error: {e}"
